@@ -1,4 +1,4 @@
-# 🤖 Dark Basilisk
+# 🐍 Dark Basilisk
 
 Command-line cybersecurity agent that runs an agent loop powered by Anthropic's Claude with a comprehensive set of tools for both red and blue team operations. It's designed to be a versatile and autonomous assistant for cybersecurity professionals, capable of performing a wide range of tasks from reconnaissance to incident response.
 
@@ -38,4 +38,4 @@ basilisk
 
 If you have ideas for improvements or new features, please open an issue or
 submit a pull request. Make sure to follow the existing code style and include
-tests for any new functionality. Licensed under the GNU GPL v3, so you are free to use, modify, and distribute this software — and any derivative must stay just as free. Please refer to the [LICENSE](LICENSE) for more!
+tests for any new functionality. Licensed under the GNU GPL v3, so you are free to use, modify, and distribute this software. Please refer to the [LICENSE](LICENSE) for more!
