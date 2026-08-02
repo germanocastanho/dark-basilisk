@@ -5,7 +5,7 @@
  */
 
 import { useReducer, useRef, useState } from "react";
-import { Box, Static, Text, useApp, useInput } from "ink";
+import { Box, Static, Text, useApp, useInput, useStdout } from "ink";
 import TextInput from "ink-text-input";
 import Spinner from "ink-spinner";
 import Anthropic from "@anthropic-ai/sdk";
@@ -161,6 +161,17 @@ export function App({
   briefing,
 }: AppProps): React.ReactNode {
   const { exit } = useApp();
+  const { stdout } = useStdout();
+
+  // Reserve the last terminal column for every repainted (non-<Static>) line.
+  // Ink's log-update erases `output.split("\n").length` rows — a logical-line
+  // count that ignores terminal soft-wrap. If any repainted line reaches the
+  // full width, the terminal wraps it into two physical rows while Ink erases
+  // only one, leaving the stray row on screen: the "mirror" the operator saw
+  // while typing past the edge. Wrapping the live regions to `columns - 1` keeps
+  // Ink's line count equal to the physical rows, so nothing is left behind.
+  const columns = stdout?.columns ?? 80;
+  const liveWidth = Math.max(20, columns - 1);
 
   const idRef = useRef(0);
   const nextId = () => idRef.current++;
@@ -349,7 +360,11 @@ export function App({
         {(entry) => <EntryView key={entry.id} entry={entry} />}
       </Static>
 
-      {live.text.length > 0 && <Text>{live.text}</Text>}
+      {live.text.length > 0 && (
+        <Box width={liveWidth}>
+          <Text>{live.text}</Text>
+        </Box>
+      )}
 
       {approval !== null ? (
         <ApprovalPrompt
@@ -367,9 +382,17 @@ export function App({
           <Text dimColor> working…</Text>
         </Box>
       ) : (
-        <Box>
-          <Text color="cyan">prompt › </Text>
-          <TextInput value={input} onChange={setInput} onSubmit={submit} />
+        <Box width={liveWidth}>
+          {/* Non-shrinking prefix + input in a flex-grow box: keeps "prompt › "
+              intact (a plain sibling Text would be shrunk by Yoga) and lets Ink
+              wrap the typed value inside the reserved width instead of letting
+              the terminal soft-wrap it. */}
+          <Box flexShrink={0}>
+            <Text color="cyan">prompt › </Text>
+          </Box>
+          <Box flexGrow={1}>
+            <TextInput value={input} onChange={setInput} onSubmit={submit} />
+          </Box>
         </Box>
       )}
     </Box>
