@@ -43,7 +43,9 @@ const SQL_ERRORS = [
 export const sqliProbe: Tool = {
   name: "sqli_probe",
   description:
-    "Heuristic SQL-injection probe on a URL query parameter: checks error-based, boolean-based, and time-based signals. Active against the target.",
+    "Heuristic SQL-injection probe on a URL query parameter: checks " +
+    "error-based, boolean-based, and time-based signals. Active " +
+    "against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -92,7 +94,8 @@ export const sqliProbe: Tool = {
         Math.abs(truthy.body.length - falsy.body.length) > 32
       ) {
         signals.push(
-          `boolean-based (true=${truthy.body.length}b vs false=${falsy.body.length}b)`,
+          `boolean-based (true=${truthy.body.length}b vs ` +
+            `false=${falsy.body.length}b)`,
         );
       }
       if (
@@ -127,7 +130,9 @@ export const sqliProbe: Tool = {
 export const xssProbe: Tool = {
   name: "xss_probe",
   description:
-    "Reflected-XSS probe on a URL query parameter: injects a unique marker and reports whether special characters reflect unencoded. Active against the target.",
+    "Reflected-XSS probe on a URL query parameter: injects a unique " +
+    "marker and reports whether special characters reflect unencoded. " +
+    "Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -188,7 +193,8 @@ export const xssProbe: Tool = {
 export const openRedirectProbe: Tool = {
   name: "open_redirect_probe",
   description:
-    "Open-redirect probe: injects an off-site URL into a parameter and checks whether the target redirects to it. Active against the target.",
+    "Open-redirect probe: injects an off-site URL into a parameter and " +
+    "checks whether the target redirects to it. Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -197,7 +203,8 @@ export const openRedirectProbe: Tool = {
       param: {
         type: "string",
         description:
-          "Redirect parameter to test (e.g. next, url, redirect). Defaults to all.",
+          "Redirect parameter to test (e.g. next, url, redirect). " +
+          "Defaults to all.",
       },
     },
     required: ["url"],
@@ -258,7 +265,9 @@ const SSRF_TARGETS = [
 export const ssrfProbe: Tool = {
   name: "ssrf_probe",
   description:
-    "Heuristic SSRF probe: injects internal/cloud-metadata URLs into a parameter and reports divergent or metadata-leaking responses. Active against the target.",
+    "Heuristic SSRF probe: injects internal/cloud-metadata URLs into a " +
+    "parameter and reports divergent or metadata-leaking responses. " +
+    "Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -272,7 +281,8 @@ export const ssrfProbe: Tool = {
       callback_url: {
         type: "string",
         description:
-          "Optional out-of-band URL to inject for confirmation (you watch it externally).",
+          "Optional out-of-band URL to inject for confirmation (you " +
+          "watch it externally).",
       },
     },
     required: ["url"],
@@ -311,7 +321,8 @@ export const ssrfProbe: Tool = {
         if (leak) lines.push(`  [!] ${name} ← ${target}: metadata leaked`);
         else if (diverges)
           lines.push(
-            `  [~] ${name} ← ${target}: response diverges (status ${res.status}, ${res.body.length}b)`,
+            `  [~] ${name} ← ${target}: response diverges ` +
+              `(status ${res.status}, ${res.body.length}b)`,
           );
       }
     }

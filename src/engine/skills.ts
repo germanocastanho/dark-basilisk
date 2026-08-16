@@ -39,7 +39,10 @@ export interface Skill {
   allowedTools?: string[];
 }
 
-/** Cap on companion files listed per skill, guarding against pathological dirs. */
+/**
+ * Cap on companion files listed per skill, guarding against pathological
+ * dirs.
+ */
 const MAX_COMPANIONS = 50;
 
 /** Cap on a single companion file's returned size, in characters. */
@@ -103,7 +106,8 @@ function parseFrontmatter(text: string): Frontmatter {
 
     let value: string;
     if (/^[|>][+-]?$/.test(indicator) || indicator === "") {
-      // Block scalar (or an empty value): gather the indented lines that follow.
+      // Block scalar (or an empty value): gather the indented lines that
+      // follow.
       const parts: string[] = [];
       while (i + 1 < lines.length && /^[ \t]/.test(lines[i + 1]!)) {
         parts.push(lines[++i]!.trim());
@@ -189,9 +193,10 @@ export function scanSkillsIn(dir: string): Skill[] {
 }
 
 /**
- * Discover skills from the repo-bundled directory and the user's XDG directory.
- * A user skill overrides a bundled one of the same name, so operators can shadow
- * or update a shipped playbook. Sorted by name for stable catalog output.
+ * Discover skills from the repo-bundled directory and the user's XDG
+ * directory. A user skill overrides a bundled one of the same name, so
+ * operators can shadow or update a shipped playbook. Sorted by name for
+ * stable catalog output.
  */
 export function discoverSkills(): Skill[] {
   const byName = new Map<string, Skill>();
@@ -204,7 +209,10 @@ export function discoverSkills(): Skill[] {
   return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** A context block advertising the available skills, or null if there are none. */
+/**
+ * A context block advertising the available skills, or null if there are
+ * none.
+ */
 export function skillsCatalog(skills: Skill[]): string | null {
   if (skills.length === 0) return null;
   const lines = skills.map((s) => `- ${s.name} — ${s.description}`);
@@ -218,9 +226,9 @@ export function skillsCatalog(skills: Skill[]): string | null {
 }
 
 /**
- * Build the `load_skill` tool bound to the discovered skills. Reading a local,
- * operator-installed playbook neither reaches the target nor changes host state,
- * so it is not gated.
+ * Build the `load_skill` tool bound to the discovered skills. Reading a
+ * local, operator-installed playbook neither reaches the target nor
+ * changes host state, so it is not gated.
  */
 export function loadSkillTool(skills: Skill[]): Tool {
   const byName = new Map(skills.map((s) => [s.name, s]));
@@ -293,7 +301,9 @@ function restrictionNotice(skill: Skill): string {
     `limited to: ${skill.allowedTools.join(", ")} (plus ${always}). ` +
     "Loading another skill without an allow-list lifts it.";
   if (unknown.length > 0) {
-    note += `\nNote: allow-list names not in the registry: ${unknown.join(", ")}.`;
+    note +=
+      `\nNote: allow-list names not in the registry: ` +
+      `${unknown.join(", ")}.`;
   }
   return note;
 }
@@ -340,7 +350,9 @@ export function readSkillFileTool(skills: Skill[]): Tool {
       if (!skill.files.includes(rel)) {
         const known = skill.files.join(", ") || "(none)";
         return {
-          content: `"${rel}" is not a file of "${skillName}". Available: ${known}.`,
+          content:
+            `"${rel}" is not a file of "${skillName}". ` +
+            `Available: ${known}.`,
           isError: true,
         };
       }

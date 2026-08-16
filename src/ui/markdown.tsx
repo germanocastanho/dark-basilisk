@@ -7,11 +7,12 @@
 import { Box, Text } from "ink";
 
 /**
- * A dependency-free Markdown renderer for the terminal. It covers the subset the
- * agent actually emits — headings, bullet/numbered lists, blockquotes, fenced
- * code, horizontal rules, and inline bold/italic/code/strikethrough/links — and
- * maps each onto Ink `<Text>` styling. Anything it doesn't recognize falls
- * through as plain text, so partial or unusual output never breaks the frame.
+ * A dependency-free Markdown renderer for the terminal. It covers the
+ * subset the agent actually emits — headings, bullet/numbered lists,
+ * blockquotes, fenced code, horizontal rules, and inline
+ * bold/italic/code/strikethrough/links — and maps each onto Ink `<Text>`
+ * styling. Anything it doesn't recognize falls through as plain text, so
+ * partial or unusual output never breaks the frame.
  *
  * Rendering is intentionally line-oriented (one `<Text>` per source line) so it
  * composes cleanly inside `<Static>`: Ink prints each committed block once and

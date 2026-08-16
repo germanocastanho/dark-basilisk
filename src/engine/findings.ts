@@ -7,7 +7,9 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, basename } from "node:path";
 
-/** Impact ratings, ordered ascending. Reverse for a most-severe-first report. */
+/**
+ * Impact ratings, ordered ascending. Reverse for a most-severe-first report.
+ */
 export const SEVERITIES = [
   "info",
   "low",
@@ -36,7 +38,10 @@ export interface Finding {
 /** The caller-supplied part of a finding — the engine fills in id and time. */
 export type FindingInput = Omit<Finding, "id" | "createdAt">;
 
-/** On-disk report: the machine-readable artifact that sits beside a transcript. */
+/**
+ * On-disk report: the machine-readable artifact that sits beside a
+ * transcript.
+ */
 export interface FindingsReport {
   version: 1;
   session: string;
@@ -51,7 +56,10 @@ export interface FindingsReport {
  * itself, keeping session-state I/O owned by the engine.
  */
 export interface FindingsStore {
-  /** Persist a finding, assigning its id/timestamp, and return the stored form. */
+  /**
+   * Persist a finding, assigning its id/timestamp, and return the stored
+   * form.
+   */
   record(input: FindingInput): Finding;
   /** Snapshot of everything recorded so far this session. */
   list(): Finding[];
@@ -59,7 +67,10 @@ export interface FindingsStore {
   readonly path: string;
 }
 
-/** Findings file that sits beside a session transcript (`<id>.findings.json`). */
+/**
+ * Findings file that sits beside a session transcript
+ * (`<id>.findings.json`).
+ */
 export function findingsPathFor(sessionPath: string): string {
   return sessionPath.endsWith(".json")
     ? `${sessionPath.slice(0, -".json".length)}.findings.json`

@@ -50,7 +50,10 @@ function sstiPayloads(
 export const sstiProbe: Tool = {
   name: "ssti_probe",
   description:
-    "Heuristic SSTI probe on a URL query parameter: injects an arithmetic expression across template engines (Jinja2, JSP-EL, Twig, ERB, Razor, ...) and reports which renders it. Active against the target.",
+    "Heuristic SSTI probe on a URL query parameter: injects an " +
+    "arithmetic expression across template engines (Jinja2, JSP-EL, " +
+    "Twig, ERB, Razor, ...) and reports which renders it. Active " +
+    "against the target.",
   risky: true,
   schema: {
     type: "object",

@@ -40,7 +40,9 @@ const XPATH_ERRORS = [
 export const xpathInjectionProbe: Tool = {
   name: "xpath_injection_probe",
   description:
-    "Heuristic XPath-injection probe on a URL query parameter: checks error-based and boolean-based (true vs false) signals. Active against the target.",
+    "Heuristic XPath-injection probe on a URL query parameter: checks " +
+    "error-based and boolean-based (true vs false) signals. Active " +
+    "against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -79,7 +81,8 @@ export const xpathInjectionProbe: Tool = {
         Math.abs(truthy.body.length - falsy.body.length) > 32
       ) {
         signals.push(
-          `boolean-based (true=${truthy.body.length}b vs false=${falsy.body.length}b)`,
+          `boolean-based (true=${truthy.body.length}b vs ` +
+            `false=${falsy.body.length}b)`,
         );
       }
       lines.push(
@@ -120,7 +123,9 @@ const LDAP_ERRORS = [
 export const ldapInjectionProbe: Tool = {
   name: "ldap_injection_probe",
   description:
-    "Heuristic LDAP-injection probe on a URL query parameter: checks error-based and wildcard-divergence signals. Active against the target.",
+    "Heuristic LDAP-injection probe on a URL query parameter: checks " +
+    "error-based and wildcard-divergence signals. Active against the " +
+    "target.",
   risky: true,
   schema: {
     type: "object",
@@ -160,7 +165,8 @@ export const ldapInjectionProbe: Tool = {
         Math.abs(wild.body.length - base.body.length) > 64
       ) {
         signals.push(
-          `wildcard divergence (base=${base.body.length}b vs *=${wild.body.length}b)`,
+          `wildcard divergence (base=${base.body.length}b vs ` +
+            `*=${wild.body.length}b)`,
         );
       }
       lines.push(

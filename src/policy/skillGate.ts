@@ -5,9 +5,10 @@
  */
 
 /**
- * Tools that stay usable no matter which skill's allow-list is active. The skill
- * navigation tools must never be locked out (or the agent could not switch or
- * lift a restriction), and recording a finding is core to every workflow.
+ * Tools that stay usable no matter which skill's allow-list is active. The
+ * skill navigation tools must never be locked out (or the agent could not
+ * switch or lift a restriction), and recording a finding is core to every
+ * workflow.
  */
 export const ALWAYS_ALLOWED: Set<string> = new Set([
   "load_skill",

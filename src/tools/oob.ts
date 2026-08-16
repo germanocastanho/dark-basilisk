@@ -58,7 +58,9 @@ function handle(req: Request, from: string): Response {
 export const oobStart: Tool = {
   name: "oob_start",
   description:
-    "Start a session-lived out-of-band HTTP listener and return a callback URL for confirming blind SSRF/XXE. The target must be able to reach the given host.",
+    "Start a session-lived out-of-band HTTP listener and return a " +
+    "callback URL for confirming blind SSRF/XXE. The target must be " +
+    "able to reach the given host.",
   risky: true,
   schema: {
     type: "object",
@@ -66,7 +68,8 @@ export const oobStart: Tool = {
       host: {
         type: "string",
         description:
-          "Host/IP the target will use to reach this listener (default localhost — set a routable address for real targets).",
+          "Host/IP the target will use to reach this listener (default " +
+          "localhost — set a routable address for real targets).",
       },
       port: {
         type: "integer",
@@ -96,7 +99,9 @@ export const oobStart: Tool = {
         });
       } catch (err) {
         return {
-          content: `Cannot start listener: ${err instanceof Error ? err.message : String(err)}`,
+          content:
+            `Cannot start listener: ` +
+            `${err instanceof Error ? err.message : String(err)}`,
           isError: true,
         };
       }
@@ -107,7 +112,8 @@ export const oobStart: Tool = {
       content:
         `OOB listener up on 0.0.0.0:${server.port}.\n` +
         `Callback URL: ${url}\n` +
-        `Inject it as callback_url in ssrf_probe / xxe_probe, then oob_poll for hits.`,
+        `Inject it as callback_url in ssrf_probe / xxe_probe, then ` +
+        `oob_poll for hits.`,
     };
   },
 };
@@ -120,7 +126,8 @@ export const oobStart: Tool = {
 export const oobPoll: Tool = {
   name: "oob_poll",
   description:
-    "Return out-of-band interactions captured by the listener (a hit confirms blind SSRF/XXE). Optionally clear the buffer after reading.",
+    "Return out-of-band interactions captured by the listener (a hit " +
+    "confirms blind SSRF/XXE). Optionally clear the buffer after reading.",
   risky: false,
   schema: {
     type: "object",

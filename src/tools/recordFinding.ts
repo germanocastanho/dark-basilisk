@@ -32,7 +32,10 @@ function cleanString(value: unknown): string | undefined {
 export const recordFinding: Tool = {
   name: "record_finding",
   description:
-    "Record a structured security finding to the session's findings log (a machine-readable report saved beside the transcript). Call it when you confirm something worth reporting: a vulnerability, misconfiguration, or notable exposure.",
+    "Record a structured security finding to the session's findings log " +
+    "(a machine-readable report saved beside the transcript). Call it " +
+    "when you confirm something worth reporting: a vulnerability, " +
+    "misconfiguration, or notable exposure.",
   schema: {
     type: "object",
     properties: {
@@ -108,7 +111,9 @@ export const recordFinding: Tool = {
     const saved = ctx.findings.record(finding);
     const total = ctx.findings.list().length;
     return {
-      content: `Recorded ${saved.id} [${saved.severity}] ${saved.title} — ${total} finding(s) logged at ${ctx.findings.path}`,
+      content:
+        `Recorded ${saved.id} [${saved.severity}] ${saved.title} — ` +
+        `${total} finding(s) logged at ${ctx.findings.path}`,
     };
   },
 };

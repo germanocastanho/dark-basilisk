@@ -40,7 +40,8 @@ export async function loadExtensions(config: Config): Promise<Extensions> {
   const skills = discoverSkills();
   if (skills.length > 0) {
     const skillTools = [loadSkillTool(skills)];
-    // Only wire the reference-file reader when a skill actually ships companions.
+    // Only wire the reference-file reader when a skill actually ships
+    // companions.
     if (skills.some((s) => s.files.length > 0)) {
       skillTools.push(readSkillFileTool(skills));
     }

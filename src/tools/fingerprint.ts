@@ -25,14 +25,15 @@ const DISCLOSURE_HEADERS = [
 ];
 
 /**
- * Fingerprint a web target: fetch the root, then report disclosed stack headers,
- * which security headers are present or missing, and cookie flags. Reaches the
- * target, so it is gated behind operator approval.
+ * Fingerprint a web target: fetch the root, then report disclosed stack
+ * headers, which security headers are present or missing, and cookie
+ * flags. Reaches the target, so it is gated behind operator approval.
  */
 export const webFingerprint: Tool = {
   name: "web_fingerprint",
   description:
-    "Fetch a URL and report disclosed stack headers, present/missing security headers, and cookie flags. Reaches the target.",
+    "Fetch a URL and report disclosed stack headers, present/missing " +
+    "security headers, and cookie flags. Reaches the target.",
   risky: true,
   schema: {
     type: "object",
@@ -92,11 +93,14 @@ export const webFingerprint: Tool = {
     });
 
     const cookies = response.headers.get("set-cookie");
-    const cookieReport = cookies
-      ? `  ${/httponly/i.test(cookies) ? "HttpOnly set" : "HttpOnly MISSING"}; ${
-          /secure/i.test(cookies) ? "Secure set" : "Secure MISSING"
-        }`
-      : "  (no Set-Cookie)";
+    let cookieReport = "  (no Set-Cookie)";
+    if (cookies) {
+      const httpOnly = /httponly/i.test(cookies)
+        ? "HttpOnly set"
+        : "HttpOnly MISSING";
+      const secure = /secure/i.test(cookies) ? "Secure set" : "Secure MISSING";
+      cookieReport = `  ${httpOnly}; ${secure}`;
+    }
 
     const report = [
       `${parsed.href} → HTTP ${response.status} ${response.statusText}`,

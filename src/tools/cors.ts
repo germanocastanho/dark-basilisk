@@ -17,7 +17,8 @@ const PROBE_ORIGIN = "https://basilisk-probe.example";
 export const corsCheck: Tool = {
   name: "cors_check",
   description:
-    "Send a crafted Origin header and report whether the server reflects it (CORS misconfiguration). Reaches the target; read-only probe.",
+    "Send a crafted Origin header and report whether the server reflects " +
+    "it (CORS misconfiguration). Reaches the target; read-only probe.",
   risky: true,
   schema: {
     type: "object",
@@ -76,19 +77,28 @@ export const corsCheck: Tool = {
     let verdict: string;
     if (!acao) {
       verdict =
-        "No Access-Control-Allow-Origin returned — CORS not enabled for this origin.";
+        "No Access-Control-Allow-Origin returned — CORS not enabled " +
+        "for this origin.";
     } else if (acao === "*") {
       verdict =
         acac === "true"
-          ? "MISCONFIG: wildcard origin with credentials is rejected by browsers, but the header pairing is invalid and worth reporting."
-          : "Wildcard origin (*). Permissive but standard for public APIs; credentials not allowed.";
+          ? "MISCONFIG: wildcard origin with credentials is rejected by " +
+            "browsers, but the header pairing is invalid and worth " +
+            "reporting."
+          : "Wildcard origin (*). Permissive but standard for public " +
+            "APIs; credentials not allowed.";
     } else if (acao === testOrigin) {
       verdict =
         acac === "true"
-          ? "FINDING: the server reflects an arbitrary Origin AND allows credentials — cross-origin credential theft is possible."
-          : "FINDING: the server reflects an arbitrary Origin. Review the allowed-origin logic.";
+          ? "FINDING: the server reflects an arbitrary Origin AND " +
+            "allows credentials — cross-origin credential theft is " +
+            "possible."
+          : "FINDING: the server reflects an arbitrary Origin. Review " +
+            "the allowed-origin logic.";
     } else {
-      verdict = `Server returned a fixed origin (${acao}); the crafted origin was not reflected.`;
+      verdict =
+        `Server returned a fixed origin (${acao}); the crafted origin ` +
+        "was not reflected.";
     }
 
     const report = [

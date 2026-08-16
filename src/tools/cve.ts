@@ -10,7 +10,10 @@ const NVD_ENDPOINT = "https://services.nvd.nist.gov/rest/json/cves/2.0";
 const DEFAULT_LIMIT = 5;
 const MAX_LIMIT = 20;
 
-/** Best CVSS base score available on a CVE entry, newest metric version first. */
+/**
+ * Best CVSS base score available on a CVE entry, newest metric version
+ * first.
+ */
 function bestScore(
   metrics: Record<string, unknown> | undefined,
 ): number | null {
@@ -46,7 +49,8 @@ function englishDescription(descs: unknown): string {
 export const cveSearch: Tool = {
   name: "cve_search",
   description:
-    "Search the NVD database for CVEs matching a keyword (e.g. 'Apache 2.4.49'). Queries a public vulnerability database, not the target.",
+    "Search the NVD database for CVEs matching a keyword (e.g. 'Apache " +
+    "2.4.49'). Queries a public vulnerability database, not the target.",
   schema: {
     type: "object",
     properties: {
@@ -56,7 +60,9 @@ export const cveSearch: Tool = {
       },
       limit: {
         type: "integer",
-        description: `Max results to return (default ${DEFAULT_LIMIT}, max ${MAX_LIMIT}).`,
+        description:
+          `Max results to return (default ${DEFAULT_LIMIT}, ` +
+          `max ${MAX_LIMIT}).`,
         minimum: 1,
         maximum: MAX_LIMIT,
       },
@@ -133,7 +139,9 @@ export const cveSearch: Tool = {
     });
 
     return {
-      content: `CVEs for "${keyword}" (top ${rows.length} by CVSS):\n${lines.join("\n")}`,
+      content:
+        `CVEs for "${keyword}" (top ${rows.length} by CVSS):\n` +
+        lines.join("\n"),
     };
   },
 };

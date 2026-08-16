@@ -88,7 +88,8 @@ async function probeAll(base: URL, paths: string[]): Promise<Probe[]> {
 export const dirProbe: Tool = {
   name: "http_probe_paths",
   description:
-    "Probe a list of paths under a base URL and report status codes (content discovery). Active against the target; capped at 100 paths.",
+    "Probe a list of paths under a base URL and report status codes " +
+    "(content discovery). Active against the target; capped at 100 paths.",
   risky: true,
   schema: {
     type: "object",
@@ -101,12 +102,14 @@ export const dirProbe: Tool = {
         type: "array",
         items: { type: "string" },
         description:
-          "Paths to probe (relative). Defaults to a small built-in list if omitted.",
+          "Paths to probe (relative). Defaults to a small built-in " +
+          "list if omitted.",
       },
       wordlist: {
         type: "string",
         description:
-          "Name of a wordlist under the basilisk wordlists dir, or a path to a wordlist file.",
+          "Name of a wordlist under the basilisk wordlists dir, or a " +
+          "path to a wordlist file.",
       },
     },
     required: ["base_url"],
@@ -163,7 +166,10 @@ export const dirProbe: Tool = {
       return `  ${String(r.status).padEnd(5)} /${r.path}${size}${loc}`;
     });
 
-    const summary = `Probed ${results.length} paths against ${base.href} — ${interesting.length} notable, ${results.length - interesting.length} were 404/error.`;
+    const errored = results.length - interesting.length;
+    const summary =
+      `Probed ${results.length} paths against ${base.href} — ` +
+      `${interesting.length} notable, ${errored} were 404/error.`;
 
     return {
       content:

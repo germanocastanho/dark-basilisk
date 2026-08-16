@@ -16,7 +16,8 @@ const MAX_BODY_BYTES = 64 * 1024;
 export const httpFetch: Tool = {
   name: "http_fetch",
   description:
-    "Perform a single HTTP(S) request and return status, headers, and a truncated body. Reaches an external host.",
+    "Perform a single HTTP(S) request and return status, headers, and a " +
+    "truncated body. Reaches an external host.",
   risky: true,
   schema: {
     type: "object",
@@ -74,11 +75,15 @@ export const httpFetch: Tool = {
       const raw = verb === "HEAD" ? "" : await response.text();
       const truncated =
         raw.length > MAX_BODY_BYTES
-          ? `${raw.slice(0, MAX_BODY_BYTES)}\n[truncated ${raw.length - MAX_BODY_BYTES} bytes]`
+          ? `${raw.slice(0, MAX_BODY_BYTES)}\n[truncated ` +
+            `${raw.length - MAX_BODY_BYTES} bytes]`
           : raw;
 
       return {
-        content: `${verb} ${parsed.href}\nHTTP ${response.status} ${response.statusText}\n\n${headers}\n\n${truncated}`,
+        content:
+          `${verb} ${parsed.href}\n` +
+          `HTTP ${response.status} ${response.statusText}\n\n` +
+          `${headers}\n\n${truncated}`,
       };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);

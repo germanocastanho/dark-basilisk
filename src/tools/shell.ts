@@ -90,7 +90,11 @@ function looksUnsafe(arg: string): boolean {
 export const runCommand: Tool = {
   name: "run_command",
   description:
-    "Run one allowlisted security tool with explicit arguments. Covers a broad red/blue arsenal — recon (nmap, subfinder, amass, httpx), fuzzing (ffuf, feroxbuster, nuclei), exploitation (sqlmap, dalfox, wpscan), credential/network (hydra, netexec, john, hashcat), and defense (trivy, semgrep, gitleaks, yara). Requires operator approval.",
+    "Run one allowlisted security tool with explicit arguments. Covers a " +
+    "broad red/blue arsenal — recon (nmap, subfinder, amass, httpx), " +
+    "fuzzing (ffuf, feroxbuster, nuclei), exploitation (sqlmap, dalfox, " +
+    "wpscan), credential/network (hydra, netexec, john, hashcat), and " +
+    "defense (trivy, semgrep, gitleaks, yara). Requires operator approval.",
   risky: true,
   schema: {
     type: "object",
@@ -115,7 +119,9 @@ export const runCommand: Tool = {
     const allowed = new Set([...ALLOWED, ...ctx.config.allowedCommands]);
     if (typeof command !== "string" || !allowed.has(command)) {
       return {
-        content: `Command "${String(command)}" is not on the allowlist. Allowed: ${[...allowed].join(", ")}`,
+        content:
+          `Command "${String(command)}" is not on the allowlist. ` +
+          `Allowed: ${[...allowed].join(", ")}`,
         isError: true,
       };
     }

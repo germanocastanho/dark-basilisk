@@ -41,7 +41,10 @@ const timeout = (ms: number): Promise<never> =>
     setTimeout(() => reject(new Error(`timed out after ${ms}ms`)), ms),
   );
 
-/** Flatten an MCP tool result's content blocks into plain text for the model. */
+/**
+ * Flatten an MCP tool result's content blocks into plain text for the
+ * model.
+ */
 function renderResult(content: unknown): string {
   if (!Array.isArray(content)) return "(no content)";
   const parts: string[] = [];
@@ -148,7 +151,10 @@ export async function connectMcpServers(
   };
 }
 
-/** A context block naming the connected MCP servers, or null if none connected. */
+/**
+ * A context block naming the connected MCP servers, or null if none
+ * connected.
+ */
 export function mcpCatalog(
   connected: { name: string; toolCount: number }[],
 ): string | null {

@@ -48,7 +48,9 @@ function hs256(signingInput: string, secret: string): string {
 export const jwtInspect: Tool = {
   name: "jwt_inspect",
   description:
-    "Decode and audit a JWT (header, claims), flag weak settings (alg=none, missing exp), and attempt an offline HS256 secret crack against a wordlist. Offline.",
+    "Decode and audit a JWT (header, claims), flag weak settings " +
+    "(alg=none, missing exp), and attempt an offline HS256 secret crack " +
+    "against a wordlist. Offline.",
   risky: false,
   schema: {
     type: "object",

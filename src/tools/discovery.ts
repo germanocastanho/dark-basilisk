@@ -57,7 +57,9 @@ const DEFAULT_PARAMS = [
 export const paramDiscover: Tool = {
   name: "param_discover",
   description:
-    "Discover hidden query parameters by testing candidate names for reflection or response changes. Active against the target; capped at 150.",
+    "Discover hidden query parameters by testing candidate names for " +
+    "reflection or response changes. Active against the target; capped " +
+    "at 150.",
   risky: true,
   schema: {
     type: "object",
@@ -102,8 +104,12 @@ export const paramDiscover: Tool = {
         res.error === undefined &&
         (res.status !== base.status ||
           Math.abs(res.body.length - base.body.length) > 32);
+      const reflectedNote = reflected ? " (reflected)" : "";
+      const changedNote = changed
+        ? ` (status ${res.status}, ${res.body.length}b)`
+        : "";
       return reflected || changed
-        ? `  [!] ${name}${reflected ? " (reflected)" : ""}${changed ? ` (status ${res.status}, ${res.body.length}b)` : ""}`
+        ? `  [!] ${name}${reflectedNote}${changedNote}`
         : null;
     });
 
@@ -142,7 +148,9 @@ const DEFAULT_VHOSTS = [
 export const vhostEnum: Tool = {
   name: "vhost_enum",
   description:
-    "Virtual-host discovery by brute-forcing the Host header against one endpoint and diffing responses. Active against the target; capped at 150.",
+    "Virtual-host discovery by brute-forcing the Host header against " +
+    "one endpoint and diffing responses. Active against the target; " +
+    "capped at 150.",
   risky: true,
   schema: {
     type: "object",
@@ -155,7 +163,8 @@ export const vhostEnum: Tool = {
       domain: {
         type: "string",
         description:
-          "Base domain; candidates become `<label>.<domain>`. If omitted, labels are used as-is.",
+          "Base domain; candidates become `<label>.<domain>`. If " +
+          "omitted, labels are used as-is.",
       },
       hosts: {
         type: "array",
@@ -226,7 +235,8 @@ const INTROSPECTION_QUERY = JSON.stringify({
 export const graphqlIntrospect: Tool = {
   name: "graphql_introspect",
   description:
-    "Send a GraphQL introspection query and summarize exposed types and root operations. Active against the target.",
+    "Send a GraphQL introspection query and summarize exposed types " +
+    "and root operations. Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -258,7 +268,9 @@ export const graphqlIntrospect: Tool = {
       parsed = JSON.parse(res.body);
     } catch {
       return {
-        content: `No JSON schema returned (status ${res.status}). Introspection likely disabled.`,
+        content:
+          `No JSON schema returned (status ${res.status}). ` +
+          "Introspection likely disabled.",
       };
     }
 
@@ -266,7 +278,9 @@ export const graphqlIntrospect: Tool = {
       ?.data?.__schema;
     if (!schema) {
       return {
-        content: `Response had no __schema (status ${res.status}). Introspection likely disabled.`,
+        content:
+          `Response had no __schema (status ${res.status}). ` +
+          "Introspection likely disabled.",
       };
     }
     const types = Array.isArray(schema.types) ? schema.types : [];
@@ -309,7 +323,8 @@ const EXPOSURE_PATHS = [
 export const gitExpose: Tool = {
   name: "git_expose",
   description:
-    "Check a base URL for exposed VCS, env, and backup artifacts (.git/HEAD, .env, *.sql, backups). Active against the target.",
+    "Check a base URL for exposed VCS, env, and backup artifacts " +
+    "(.git/HEAD, .env, *.sql, backups). Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -363,7 +378,8 @@ export const gitExpose: Tool = {
 export const cloudStorageCheck: Tool = {
   name: "cloud_storage_check",
   description:
-    "Check whether a cloud storage bucket (S3/GCS) is publicly listable. Accepts a bucket name or an endpoint URL.",
+    "Check whether a cloud storage bucket (S3/GCS) is publicly " +
+    "listable. Accepts a bucket name or an endpoint URL.",
   risky: true,
   schema: {
     type: "object",

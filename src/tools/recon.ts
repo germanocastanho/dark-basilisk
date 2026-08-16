@@ -18,13 +18,15 @@ function isHostname(value: unknown): value is string {
 }
 
 /**
- * Passive DNS reconnaissance. Read-only and low risk, so it runs without a gate.
+ * Passive DNS reconnaissance. Read-only and low risk, so it runs without
+ * a gate.
  * Resolves the common record types for a hostname and reports what answered.
  */
 export const dnsLookup: Tool = {
   name: "dns_lookup",
   description:
-    "Resolve DNS records (A, AAAA, MX, NS, TXT, CNAME) for a hostname. Read-only reconnaissance.",
+    "Resolve DNS records (A, AAAA, MX, NS, TXT, CNAME) for a hostname. " +
+    "Read-only reconnaissance.",
   schema: {
     type: "object",
     properties: {

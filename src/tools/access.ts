@@ -61,7 +61,9 @@ function pathVariants(
 export const idorProbe: Tool = {
   name: "idor_probe",
   description:
-    "Enumerate an object id (in the path via FUZZ, or a query param) across a range and report which return accessible responses — signals IDOR. Active against the target.",
+    "Enumerate an object id (in the path via FUZZ, or a query param) " +
+    "across a range and report which return accessible responses — " +
+    "signals IDOR. Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -124,7 +126,8 @@ export const idorProbe: Tool = {
       content:
         `IDOR probe — ${count} ids from ${start}\n` +
         (accessible.length > 0
-          ? `${lines.join("\n")}\n${accessible.length}/${count} accessible — verify these are not all meant to be public.`
+          ? `${lines.join("\n")}\n${accessible.length}/${count} ` +
+            "accessible — verify these are not all meant to be public."
           : "  No accessible objects in range."),
     };
   },
@@ -138,7 +141,10 @@ export const idorProbe: Tool = {
  */
 export const credentialSpray: Tool = {
   name: "credential_spray",
-  description: `Bounded credential test against a login endpoint (max ${MAX_ATTEMPTS} attempts). Flags responses diverging from a failed-login baseline. Active and state-touching; requires approval.`,
+  description:
+    `Bounded credential test against a login endpoint (max ` +
+    `${MAX_ATTEMPTS} attempts). Flags responses diverging from a ` +
+    "failed-login baseline. Active and state-touching; requires approval.",
   risky: true,
   schema: {
     type: "object",
@@ -228,8 +234,10 @@ export const credentialSpray: Tool = {
         res.status !== baseline.status ||
         Math.abs(res.body.length - baseline.body.length) > 48 ||
         (setCookie !== null && /session|token|auth/i.test(setCookie));
+      const cookieNote = setCookie ? " (Set-Cookie)" : "";
       return diverges
-        ? `  [!] ${u}:${p} → status ${res.status}, ${res.body.length}b${setCookie ? " (Set-Cookie)" : ""}`
+        ? `  [!] ${u}:${p} → status ${res.status}, ` +
+            `${res.body.length}b${cookieNote}`
         : null;
     });
 
@@ -262,7 +270,10 @@ function looksBypassed(baseStatus: number, status: number): boolean {
 export const authBypassProbe: Tool = {
   name: "auth_bypass_probe",
   description:
-    "Probe a protected URL for access-control bypass: spoofed IP/forwarding headers, X-Original-URL/X-Rewrite-URL overrides, and path-normalization tricks that turn a 401/403 into a 2xx. Active against the target.",
+    "Probe a protected URL for access-control bypass: spoofed " +
+    "IP/forwarding headers, X-Original-URL/X-Rewrite-URL overrides, " +
+    "and path-normalization tricks that turn a 401/403 into a 2xx. " +
+    "Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -289,8 +300,9 @@ export const authBypassProbe: Tool = {
     if (base.status !== 401 && base.status !== 403) {
       return {
         content:
-          `Baseline is HTTP ${base.status}, not 401/403 — the resource is not ` +
-          `access-controlled as given, so there is nothing to bypass.`,
+          `Baseline is HTTP ${base.status}, not 401/403 — the resource ` +
+          "is not access-controlled as given, so there is nothing to " +
+          "bypass.",
       };
     }
 
@@ -326,7 +338,8 @@ export const authBypassProbe: Tool = {
       content:
         `Auth-bypass probe on ${url.href} (baseline HTTP ${base.status})\n` +
         (lines.length > 0
-          ? `${lines.join("\n")}\nBypass found — verify the response is the protected content.`
+          ? `${lines.join("\n")}\nBypass found — verify the response ` +
+            "is the protected content."
           : "  No bypass: every variant stayed denied."),
     };
   },

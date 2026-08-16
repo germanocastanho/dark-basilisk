@@ -38,7 +38,9 @@ const SER_SIGNATURES: Array<{ label: string; re: RegExp }> = [
 export const deserializationProbe: Tool = {
   name: "deserialization_probe",
   description:
-    "Scan a URL's response and cookies for native serialization signatures (Java, PHP, .NET ViewState, pickle, Ruby Marshal) to surface a deserialization attack surface. Active against the target.",
+    "Scan a URL's response and cookies for native serialization " +
+    "signatures (Java, PHP, .NET ViewState, pickle, Ruby Marshal) to " +
+    "surface a deserialization attack surface. Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -71,7 +73,8 @@ export const deserializationProbe: Tool = {
       content:
         `Deserialization surface on ${url.href} (HTTP ${res.status})\n` +
         (lines.length > 0
-          ? `${lines.join("\n")}\nNative serialization exposed — assess gadget chains manually.`
+          ? `${lines.join("\n")}\nNative serialization exposed — assess ` +
+            "gadget chains manually."
           : "  No native serialization signatures found."),
     };
   },

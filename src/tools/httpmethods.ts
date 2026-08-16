@@ -17,14 +17,16 @@ const RISKY_METHODS: Record<string, string> = {
 
 /**
  * Enumerate the HTTP methods a URL accepts and flag dangerous ones. Sends an
- * OPTIONS request and reads the `Allow` header; reaches the target, so it is
- * gated. Does not actually exercise the risky methods — it only reports what the
- * server advertises.
+ * OPTIONS request and reads the `Allow` header; reaches the target, so it
+ * is gated. Does not actually exercise the risky methods — it only
+ * reports what the server advertises.
  */
 export const httpMethods: Tool = {
   name: "http_methods",
   description:
-    "Send OPTIONS to a URL and report the advertised HTTP methods, flagging dangerous ones (PUT/DELETE/TRACE/...). Reaches the target; read-only probe.",
+    "Send OPTIONS to a URL and report the advertised HTTP methods, " +
+    "flagging dangerous ones (PUT/DELETE/TRACE/...). Reaches the " +
+    "target; read-only probe.",
   risky: true,
   schema: {
     type: "object",
@@ -73,7 +75,10 @@ export const httpMethods: Tool = {
     const allow = response.headers.get("allow");
     if (!allow) {
       return {
-        content: `OPTIONS ${parsed.href} → HTTP ${response.status}, no Allow header. The server may not advertise methods; probe individually if needed.`,
+        content:
+          `OPTIONS ${parsed.href} → HTTP ${response.status}, no Allow ` +
+          "header. The server may not advertise methods; probe " +
+          "individually if needed.",
       };
     }
 

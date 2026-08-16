@@ -20,7 +20,9 @@ const MAX_FILE_BYTES = 1024 * 1024;
 export const sigmaGenerate: Tool = {
   name: "sigma_generate",
   description:
-    "Generate a Sigma detection rule (YAML) from a title, log source, and field selection. Offline; use it to turn a finding into a deployable detection.",
+    "Generate a Sigma detection rule (YAML) from a title, log source, " +
+    "and field selection. Offline; use it to turn a finding into a " +
+    "deployable detection.",
   risky: false,
   schema: {
     type: "object",
@@ -146,7 +148,9 @@ const LOG_SIGNATURES: Array<{ label: string; re: RegExp }> = [
 export const logTriage: Tool = {
   name: "log_triage",
   description:
-    "Scan a local log file for attack signatures (SQLi, XSS, traversal, command injection, Log4Shell, scanners, auth failures) and summarize hits. Confined to the working directory.",
+    "Scan a local log file for attack signatures (SQLi, XSS, traversal, " +
+    "command injection, Log4Shell, scanners, auth failures) and " +
+    "summarize hits. Confined to the working directory.",
   risky: false,
   schema: {
     type: "object",
@@ -175,14 +179,18 @@ export const logTriage: Tool = {
       const bytes = await readFile(target);
       if (bytes.byteLength > MAX_FILE_BYTES) {
         return {
-          content: `File is ${bytes.byteLength} bytes, over the ${MAX_FILE_BYTES}-byte limit.`,
+          content:
+            `File is ${bytes.byteLength} bytes, over the ` +
+            `${MAX_FILE_BYTES}-byte limit.`,
           isError: true,
         };
       }
       text = bytes.toString("utf8");
     } catch (err) {
       return {
-        content: `Cannot read file: ${err instanceof Error ? err.message : String(err)}`,
+        content:
+          `Cannot read file: ` +
+          `${err instanceof Error ? err.message : String(err)}`,
         isError: true,
       };
     }
@@ -218,7 +226,9 @@ export const logTriage: Tool = {
           `  [!] ${label}: ${e.count} hit(s)\n${e.samples.join("\n")}`,
       );
     return {
-      content: `Triaged ${lines.length} lines across ${hits.size} signature(s):\n${blocks.join("\n")}`,
+      content:
+        `Triaged ${lines.length} lines across ${hits.size} ` +
+        `signature(s):\n${blocks.join("\n")}`,
     };
   },
 };
@@ -270,7 +280,9 @@ function parseManifest(name: string, body: string): Dep[] {
 export const dependencyAudit: Tool = {
   name: "dependency_audit",
   description:
-    "Audit a local package.json or requirements.txt against the OSV.dev vulnerability database and report vulnerable dependencies. Queries a public DB, not the target.",
+    "Audit a local package.json or requirements.txt against the " +
+    "OSV.dev vulnerability database and report vulnerable dependencies. " +
+    "Queries a public DB, not the target.",
   risky: false,
   schema: {
     type: "object",
@@ -278,7 +290,8 @@ export const dependencyAudit: Tool = {
       path: {
         type: "string",
         description:
-          "Manifest path (package.json or requirements.txt), relative to the working directory.",
+          "Manifest path (package.json or requirements.txt), relative " +
+          "to the working directory.",
       },
     },
     required: ["path"],
@@ -296,7 +309,9 @@ export const dependencyAudit: Tool = {
       body = (await readFile(target)).toString("utf8");
     } catch (err) {
       return {
-        content: `Cannot read manifest: ${err instanceof Error ? err.message : String(err)}`,
+        content:
+          `Cannot read manifest: ` +
+          `${err instanceof Error ? err.message : String(err)}`,
         isError: true,
       };
     }
@@ -329,7 +344,9 @@ export const dependencyAudit: Tool = {
       payload = (await res.json()) as typeof payload;
     } catch (err) {
       return {
-        content: `OSV lookup failed: ${err instanceof Error ? err.message : String(err)}`,
+        content:
+          `OSV lookup failed: ` +
+          `${err instanceof Error ? err.message : String(err)}`,
         isError: true,
       };
     } finally {
@@ -343,7 +360,8 @@ export const dependencyAudit: Tool = {
       if (vulns.length > 0) {
         const dep = deps[i]!;
         lines.push(
-          `  [!] ${dep.name}@${dep.version} — ${vulns.map((v) => v.id).join(", ")}`,
+          `  [!] ${dep.name}@${dep.version} — ` +
+            `${vulns.map((v) => v.id).join(", ")}`,
         );
       }
     });
@@ -394,7 +412,9 @@ const HARDENING: HeaderCheck[] = [
 export const headerHarden: Tool = {
   name: "header_harden",
   description:
-    "Fetch a URL's response headers and recommend fixes for missing/weak security headers (HSTS, CSP, X-Frame-Options, ...). Active against the target.",
+    "Fetch a URL's response headers and recommend fixes for " +
+    "missing/weak security headers (HSTS, CSP, X-Frame-Options, ...). " +
+    "Active against the target.",
   risky: true,
   schema: {
     type: "object",
@@ -462,7 +482,9 @@ function classifyIndicator(ioc: string): string {
 export const iocCheck: Tool = {
   name: "ioc_check",
   description:
-    "Classify indicators (hashes, IPs, domains, URLs) and check IPv4s against a public DNS blocklist (Spamhaus ZEN). Uses public DNS only, not the target.",
+    "Classify indicators (hashes, IPs, domains, URLs) and check IPv4s " +
+    "against a public DNS blocklist (Spamhaus ZEN). Uses public DNS " +
+    "only, not the target.",
   risky: false,
   schema: {
     type: "object",

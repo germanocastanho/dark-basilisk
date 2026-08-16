@@ -56,14 +56,16 @@ function isDomain(value: unknown): value is string {
 }
 
 /**
- * DNS-based subdomain brute force. Queries public resolvers for `<label>.domain`
- * candidates — it never connects to the target's own servers — so, like
- * `dns_lookup`, it is not gated. Hard-capped at 150 labels with a bounded pool.
+ * DNS-based subdomain brute force. Queries public resolvers for
+ * `<label>.domain` candidates — it never connects to the target's own
+ * servers — so, like `dns_lookup`, it is not gated. Hard-capped at 150
+ * labels with a bounded pool.
  */
 export const subdomainEnum: Tool = {
   name: "subdomain_enum",
   description:
-    "Discover subdomains by resolving <label>.<domain> candidates via DNS. Queries public resolvers, not the target; capped at 150 labels.",
+    "Discover subdomains by resolving <label>.<domain> candidates via " +
+    "DNS. Queries public resolvers, not the target; capped at 150 labels.",
   schema: {
     type: "object",
     properties: {
@@ -77,7 +79,8 @@ export const subdomainEnum: Tool = {
       wordlist: {
         type: "string",
         description:
-          "Name of a wordlist under the basilisk wordlists dir, or a path to a wordlist file.",
+          "Name of a wordlist under the basilisk wordlists dir, or a " +
+          "path to a wordlist file.",
       },
     },
     required: ["domain"],
@@ -134,7 +137,9 @@ export const subdomainEnum: Tool = {
     );
     found.sort();
 
-    const summary = `Tried ${candidates.length} labels under ${domain} — ${found.length} resolved.`;
+    const summary =
+      `Tried ${candidates.length} labels under ${domain} — ` +
+      `${found.length} resolved.`;
     return {
       content:
         found.length > 0

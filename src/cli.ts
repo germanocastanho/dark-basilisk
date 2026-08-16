@@ -60,9 +60,10 @@ function directivesNote(directives: OperatorDirectives): string[] {
 }
 
 /**
- * Start an interactive session. Resolves auth and settings up front (so a clean
- * error prints normally), then hands the conversation to the Ink app, which owns
- * the terminal: input, streaming, the approval gate, and per-turn persistence.
+ * Start an interactive session. Resolves auth and settings up front (so a
+ * clean error prints normally), then hands the conversation to the Ink app,
+ * which owns the terminal: input, streaming, the approval gate, and
+ * per-turn persistence.
  */
 async function chat(options: ChatOptions): Promise<void> {
   const client = createClient();
@@ -197,9 +198,9 @@ interface ReportOptions {
 }
 
 /**
- * Render a session's findings as a deliverable report (Markdown or PDF). Markdown
- * goes to stdout or a file; PDF is binary and requires `--out`. Builds on the
- * same findings store the session writes.
+ * Render a session's findings as a deliverable report (Markdown or PDF).
+ * Markdown goes to stdout or a file; PDF is binary and requires `--out`.
+ * Builds on the same findings store the session writes.
  */
 async function printReport(options: ReportOptions): Promise<void> {
   if (options.format && options.format !== "md" && options.format !== "pdf") {
@@ -237,7 +238,8 @@ async function printReport(options: ReportOptions): Promise<void> {
     writeFileSync(options.out, await renderPdf(report, now));
     write(
       colors.dim(
-        `Wrote pdf report (${report.findings.length} findings) to ${options.out}\n`,
+        `Wrote pdf report (${report.findings.length} findings) to ` +
+          `${options.out}\n`,
       ),
     );
     return;
@@ -248,7 +250,8 @@ async function printReport(options: ReportOptions): Promise<void> {
     writeFileSync(options.out, md, "utf8");
     write(
       colors.dim(
-        `Wrote md report (${report.findings.length} findings) to ${options.out}\n`,
+        `Wrote md report (${report.findings.length} findings) to ` +
+          `${options.out}\n`,
       ),
     );
     return;

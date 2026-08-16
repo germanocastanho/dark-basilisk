@@ -48,7 +48,9 @@ function inspect(host: string, port: number): Promise<TlsInfo> {
 export const tlsInspect: Tool = {
   name: "tls_inspect",
   description:
-    "Open a TLS connection to host:port and report the certificate (subject, issuer, validity, SANs) plus protocol and cipher. Reaches the target.",
+    "Open a TLS connection to host:port and report the certificate " +
+    "(subject, issuer, validity, SANs) plus protocol and cipher. " +
+    "Reaches the target.",
   risky: true,
   schema: {
     type: "object",

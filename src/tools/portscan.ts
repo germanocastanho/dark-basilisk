@@ -56,14 +56,15 @@ async function scan(host: string, ports: number[]): Promise<number[]> {
 }
 
 /**
- * Native TCP connect scan — no nmap dependency. Reaches the target, so it is
- * gated, and hard-capped at 200 ports with a bounded pool so it cannot be turned
- * into a flood. Reports open ports only.
+ * Native TCP connect scan — no nmap dependency. Reaches the target, so it
+ * is gated, and hard-capped at 200 ports with a bounded pool so it cannot
+ * be turned into a flood. Reports open ports only.
  */
 export const tcpScan: Tool = {
   name: "tcp_scan",
   description:
-    "TCP connect scan of a host (no nmap needed). Reaches the target; capped at 200 ports. Reports open ports.",
+    "TCP connect scan of a host (no nmap needed). Reaches the target; " +
+    "capped at 200 ports. Reports open ports.",
   risky: true,
   schema: {
     type: "object",
@@ -98,7 +99,8 @@ export const tcpScan: Tool = {
     }
 
     const open = await scan(host, list);
-    const summary = `Scanned ${list.length} ports on ${host} — ${open.length} open.`;
+    const summary =
+      `Scanned ${list.length} ports on ${host} — ` + `${open.length} open.`;
     return {
       content:
         open.length > 0

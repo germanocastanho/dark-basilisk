@@ -36,17 +36,21 @@ type Entry =
   | { id: number; kind: "notice"; level: "warn" | "error"; text: string }
   | { id: number; kind: "system"; text: string };
 
-/** In-progress assistant output for the current turn, rendered below the log. */
+/**
+ * In-progress assistant output for the current turn, rendered below the
+ * log.
+ */
 interface Live {
   text: string;
 }
 
 /**
- * Split streamed output into the part safe to commit and the part still growing.
- * A block is "settled" once a blank line follows it while no code fence is open,
- * so everything up to the last such boundary will never change again. Committing
- * it into `<Static>` keeps the live (repainted) frame small — the fix that stops
- * tall-frame repaints from flickering and yanking the scroll position around.
+ * Split streamed output into the part safe to commit and the part still
+ * growing. A block is "settled" once a blank line follows it while no
+ * code fence is open, so everything up to the last such boundary will
+ * never change again. Committing it into `<Static>` keeps the live
+ * (repainted) frame small — the fix that stops tall-frame repaints from
+ * flickering and yanking the scroll position around.
  * See [[ui-conventions]].
  */
 function splitSettled(buffer: string): [settled: string, rest: string] {
@@ -87,10 +91,16 @@ export interface AppProps {
 /** Turn an SDK/network error into a short, actionable line for the operator. */
 function describeTurnError(err: unknown): string {
   if (err instanceof Anthropic.RateLimitError) {
-    return "Rate limited by the API — usage limit hit. Wait a bit and try again.";
+    return (
+      "Rate limited by the API — usage limit hit. Wait a bit and try " +
+      "again."
+    );
   }
   if (err instanceof Anthropic.AuthenticationError) {
-    return "Authentication failed. Check that ANTHROPIC_API_KEY is set and valid.";
+    return (
+      "Authentication failed. Check that ANTHROPIC_API_KEY is set and " +
+      "valid."
+    );
   }
   if (err instanceof Anthropic.APIError) {
     return `API error ${err.status ?? "?"}: ${err.message}`;
@@ -180,8 +190,9 @@ export function App({
   // count that ignores terminal soft-wrap. If any repainted line reaches the
   // full width, the terminal wraps it into two physical rows while Ink erases
   // only one, leaving the stray row on screen: the "mirror" the operator saw
-  // while typing past the edge. Wrapping the live regions to `columns - 1` keeps
-  // Ink's line count equal to the physical rows, so nothing is left behind.
+  // while typing past the edge. Wrapping the live regions to
+  // `columns - 1` keeps Ink's line count equal to the physical rows, so
+  // nothing is left behind.
   const columns = stdout?.columns ?? 80;
   const liveWidth = Math.max(20, columns - 1);
 

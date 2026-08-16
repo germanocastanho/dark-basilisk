@@ -19,7 +19,8 @@ const MAX_MATCHES = 200;
 export const scanFile: Tool = {
   name: "scan_file",
   description:
-    "Read a local file for code/log analysis, optionally keeping only lines matching a regex. Confined to the working directory.",
+    "Read a local file for code/log analysis, optionally keeping only " +
+    "lines matching a regex. Confined to the working directory.",
   schema: {
     type: "object",
     properties: {
@@ -52,7 +53,9 @@ export const scanFile: Tool = {
       const bytes = await readFile(target);
       if (bytes.byteLength > MAX_FILE_BYTES) {
         return {
-          content: `File is ${bytes.byteLength} bytes, over the ${MAX_FILE_BYTES}-byte limit. Narrow the read.`,
+          content:
+            `File is ${bytes.byteLength} bytes, over the ` +
+            `${MAX_FILE_BYTES}-byte limit. Narrow the read.`,
           isError: true,
         };
       }
