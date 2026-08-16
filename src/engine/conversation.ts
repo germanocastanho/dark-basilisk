@@ -109,18 +109,21 @@ export async function runTurn(
   emit: (event: TurnEvent) => void,
   config: ModelConfig = DEFAULT_MODEL,
   briefing?: string,
+  directives?: string,
 ): Promise<Message[]> {
-  // Frozen prompt stays the cached prefix; a session briefing (installed skills,
-  // connected MCP servers) rides after it as a separate, non-cached block so the
-  // no-extension path is byte-identical to before.
-  const system: string | Anthropic.TextBlockParam[] = briefing
+  // Frozen prompt stays the cached prefix; a session briefing (installed
+  // skills, connected MCP servers) and operator directives ride after it as
+  // a separate, non-cached block so the no-extension path is byte-identical
+  // to before.
+  const extra = [briefing, directives].filter(Boolean).join("\n\n");
+  const system: string | Anthropic.TextBlockParam[] = extra
     ? [
         {
           type: "text",
           text: SYSTEM_PROMPT,
           cache_control: { type: "ephemeral" },
         },
-        { type: "text", text: briefing },
+        { type: "text", text: extra },
       ]
     : SYSTEM_PROMPT;
 
