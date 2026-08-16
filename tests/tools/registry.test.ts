@@ -12,6 +12,7 @@ import {
 } from "../../src/tools/registry.ts";
 import type { Tool, ToolContext } from "../../src/tools/types.ts";
 import type { SkillGate } from "../../src/policy/skillGate.ts";
+import { createDirectives, denyTool } from "../../src/policy/directives.ts";
 import type { Config } from "../../src/engine/config.ts";
 import type { Finding, FindingsStore } from "../../src/engine/findings.ts";
 import { DEFAULT_MODEL } from "../../src/engine/model.ts";
@@ -75,6 +76,20 @@ describe("dispatch", () => {
     expect(out.isError).toBe(true);
     expect(out.content).toContain("Operator denied");
     expect(calls()).toBe(1);
+  });
+
+  test("refuses a tool denied by an operator directive", async () => {
+    const { ctx, calls } = makeCtx([], () => true);
+    const directives = createDirectives();
+    denyTool(directives, "http_fetch");
+    const out = await dispatch(
+      "http_fetch",
+      { url: "https://target.example/" },
+      { ...ctx, directives },
+    );
+    expect(out.isError).toBe(true);
+    expect(out.content).toContain("denied by an operator directive");
+    expect(calls()).toBe(0);
   });
 });
 
