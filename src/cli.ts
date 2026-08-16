@@ -7,9 +7,7 @@
 
 import { writeFileSync } from "node:fs";
 import { Command } from "commander";
-import type Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "./engine/model.ts";
-import { runTurn, type TurnEvent } from "./engine/conversation.ts";
 import {
   newSessionPath,
   loadSession,
@@ -24,7 +22,6 @@ import {
   skillsDir,
 } from "./engine/skills.ts";
 import {
-  createFindingsStore,
   findingsPathFor,
   loadReport,
   SEVERITIES,
@@ -37,18 +34,13 @@ import {
   renderPdf,
   type ReportFormat,
 } from "./engine/report.ts";
-import { denyAll } from "./policy/approval.ts";
-import { createSkillGate } from "./policy/skillGate.ts";
 import {
   createDirectives,
   addNote,
   denyTool,
-  formatDirectives,
   type OperatorDirectives,
 } from "./policy/directives.ts";
-import type { ToolContext } from "./tools/types.ts";
 import { colors, write } from "./ui/stream.ts";
-import { printBanner } from "./ui/banner.ts";
 import { startChat } from "./ui/chat.tsx";
 
 interface ChatOptions {
@@ -106,96 +98,6 @@ async function chat(options: ChatOptions): Promise<void> {
   }
   // Safety-net save; the app already persists after every turn.
   saveSession(sessionPath, history);
-}
-
-/** Render a turn event to stdout — the non-interactive counterpart to the Ink UI. */
-function printTurnEvent(event: TurnEvent): void {
-  switch (event.type) {
-    case "thinking_start":
-      write(colors.dim("\nthinking… "));
-      break;
-    case "thinking":
-      write(colors.dim(event.text));
-      break;
-    case "text":
-      write(event.text);
-      break;
-    case "tool":
-      write(colors.accent(`\n→ ${event.name}\n`));
-      break;
-    case "notice":
-      write(
-        (event.level === "error" ? colors.error : colors.warn)(
-          `\n${event.text}\n`,
-        ),
-      );
-      break;
-  }
-}
-
-/**
- * Run a single task unattended: no prompts, risky tools auto-denied (`denyAll`).
- * Read-only recon still runs, findings are recorded, and the transcript is saved
- * so `basilisk findings`/`report` work afterwards.
- */
-async function runOnce(
-  task: string,
-  directives: OperatorDirectives,
-): Promise<void> {
-  const client = createClient();
-  const config = loadConfig();
-  const extensions = await loadExtensions(config);
-  const sessionPath = newSessionPath();
-
-  const ctx: ToolContext = {
-    workdir: process.cwd(),
-    confirm: denyAll,
-    config,
-    findings: createFindingsStore(sessionPath),
-    skillGate: createSkillGate(),
-    directives,
-  };
-
-  write(printBanner());
-  write(
-    colors.dim(
-      `basilisk (headless) · ${config.model.model} · ${sessionPath}\n`,
-    ),
-  );
-  for (const note of extensions.notes) write(colors.dim(`${note}\n`));
-  for (const note of directivesNote(directives)) {
-    write(colors.dim(`${note}\n`));
-  }
-  write(colors.dim("Risky tools are auto-denied in this mode.\n\n"));
-
-  const history: Anthropic.MessageParam[] = [{ role: "user", content: task }];
-  try {
-    await runTurn(
-      client,
-      history,
-      ctx,
-      printTurnEvent,
-      config.model,
-      extensions.briefing,
-      formatDirectives(directives),
-    );
-  } catch (err) {
-    write(
-      colors.error(`\n${err instanceof Error ? err.message : String(err)}\n`),
-    );
-    process.exitCode = 1;
-  } finally {
-    await extensions.close();
-    saveSession(sessionPath, history);
-  }
-
-  const count = ctx.findings.list().length;
-  write(
-    colors.dim(
-      `\n\nFindings recorded: ${count}. ` +
-        `Report with: basilisk report --session ${sessionPath}\n`,
-    ),
-  );
 }
 
 /** Print saved sessions so the operator can pick one to resume. */
@@ -369,10 +271,6 @@ program
   .version("0.1.0")
   .option("--resume <path>", "Resume a saved session file")
   .option(
-    "-p, --print <task>",
-    "Run a single task headless (no prompts, risky tools auto-denied)",
-  )
-  .option(
     "--instruct <text>",
     "Operator directive for this session (repeatable)",
     collect,
@@ -387,7 +285,6 @@ program
   .action(
     async (opts: {
       resume?: string;
-      print?: string;
       instruct: string[];
       denyTool: string[];
     }) => {
@@ -395,11 +292,7 @@ program
       for (const note of opts.instruct) addNote(directives, note);
       for (const name of opts.denyTool) denyTool(directives, name);
       try {
-        if (opts.print !== undefined) {
-          await runOnce(opts.print, directives);
-        } else {
-          await chat({ resume: opts.resume, directives });
-        }
+        await chat({ resume: opts.resume, directives });
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         write(colors.error(`\nfatal: ${message}\n`));
