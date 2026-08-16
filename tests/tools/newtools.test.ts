@@ -350,6 +350,15 @@ describe("out-of-band listener", () => {
     expect(poll.content).toContain("OOB interaction");
     expect(poll.content).toContain("GET");
   });
+
+  test("ignores a request that doesn't carry the callback token", async () => {
+    const start = await oobStart.run({ host: "localhost" }, makeCtx("/tmp"));
+    const url = start.content.match(/Callback URL: (\S+)/)?.[1];
+    const listener = new URL(url!);
+    await fetch(`${listener.origin}/unrelated-path`);
+    const poll = await oobPoll.run({ clear: true }, makeCtx("/tmp"));
+    expect(poll.content).toContain("No interactions");
+  });
 });
 
 describe("registry wiring for new tools", () => {

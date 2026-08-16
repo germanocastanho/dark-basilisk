@@ -26,17 +26,26 @@ let server: ReturnType<typeof Bun.serve> | null = null;
 let token = "";
 let interactions: Interaction[] = [];
 
+/** Whether a request's path carries the session's callback token. */
+function matchesToken(pathname: string): boolean {
+  return pathname === `/${token}` || pathname.startsWith(`/${token}/`);
+}
+
 function handle(req: Request, from: string): Response {
   const url = new URL(req.url);
-  interactions.push({
-    at: new Date().toISOString(),
-    method: req.method,
-    path: url.pathname + url.search,
-    from,
-    userAgent: req.headers.get("user-agent") ?? "",
-  });
-  if (interactions.length > MAX_INTERACTIONS) {
-    interactions = interactions.slice(-MAX_INTERACTIONS);
+  // Ignore requests that don't carry the token — otherwise unrelated
+  // internet/scanner noise on a routable listener gets recorded as a hit.
+  if (matchesToken(url.pathname)) {
+    interactions.push({
+      at: new Date().toISOString(),
+      method: req.method,
+      path: url.pathname + url.search,
+      from,
+      userAgent: req.headers.get("user-agent") ?? "",
+    });
+    if (interactions.length > MAX_INTERACTIONS) {
+      interactions = interactions.slice(-MAX_INTERACTIONS);
+    }
   }
   return new Response("ok\n");
 }
