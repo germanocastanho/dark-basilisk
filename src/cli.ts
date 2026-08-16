@@ -39,6 +39,13 @@ import {
 } from "./engine/report.ts";
 import { denyAll } from "./policy/approval.ts";
 import { createSkillGate } from "./policy/skillGate.ts";
+import {
+  createDirectives,
+  addNote,
+  denyTool,
+  formatDirectives,
+  type OperatorDirectives,
+} from "./policy/directives.ts";
 import type { ToolContext } from "./tools/types.ts";
 import { colors, write } from "./ui/stream.ts";
 import { printBanner } from "./ui/banner.ts";
@@ -46,6 +53,18 @@ import { startChat } from "./ui/chat.tsx";
 
 interface ChatOptions {
   resume?: string;
+  directives: OperatorDirectives;
+}
+
+/** One line summarizing startup directives, if any were given. */
+function directivesNote(directives: OperatorDirectives): string[] {
+  if (directives.notes.length === 0 && directives.deniedTools.size === 0) {
+    return [];
+  }
+  return [
+    `Operator directives: ${directives.notes.length} note(s), ` +
+      `${directives.deniedTools.size} denied tool(s). See /directives.`,
+  ];
 }
 
 /**
@@ -67,6 +86,7 @@ async function chat(options: ChatOptions): Promise<void> {
       ? `Resumed ${history.length} messages from ${sessionPath}.`
       : `Session: ${sessionPath}`,
     ...extensions.notes,
+    ...directivesNote(options.directives),
     "Authorized testing only. /help for commands, /exit to quit.",
   ];
 
@@ -79,6 +99,7 @@ async function chat(options: ChatOptions): Promise<void> {
       config,
       banner,
       briefing: extensions.briefing,
+      directives: options.directives,
     });
   } finally {
     await extensions.close();
@@ -117,7 +138,10 @@ function printTurnEvent(event: TurnEvent): void {
  * Read-only recon still runs, findings are recorded, and the transcript is saved
  * so `basilisk findings`/`report` work afterwards.
  */
-async function runOnce(task: string): Promise<void> {
+async function runOnce(
+  task: string,
+  directives: OperatorDirectives,
+): Promise<void> {
   const client = createClient();
   const config = loadConfig();
   const extensions = await loadExtensions(config);
@@ -129,6 +153,7 @@ async function runOnce(task: string): Promise<void> {
     config,
     findings: createFindingsStore(sessionPath),
     skillGate: createSkillGate(),
+    directives,
   };
 
   write(printBanner());
@@ -138,6 +163,9 @@ async function runOnce(task: string): Promise<void> {
     ),
   );
   for (const note of extensions.notes) write(colors.dim(`${note}\n`));
+  for (const note of directivesNote(directives)) {
+    write(colors.dim(`${note}\n`));
+  }
   write(colors.dim("Risky tools are auto-denied in this mode.\n\n"));
 
   const history: Anthropic.MessageParam[] = [{ role: "user", content: task }];
@@ -149,6 +177,7 @@ async function runOnce(task: string): Promise<void> {
       printTurnEvent,
       config.model,
       extensions.briefing,
+      formatDirectives(directives),
     );
   } catch (err) {
     write(
@@ -325,6 +354,11 @@ async function printReport(options: ReportOptions): Promise<void> {
   write(md.endsWith("\n") ? md : `${md}\n`);
 }
 
+/** Commander repeatable-option accumulator. */
+function collect(value: string, previous: string[]): string[] {
+  return [...previous, value];
+}
+
 const program = new Command();
 
 program
@@ -338,19 +372,41 @@ program
     "-p, --print <task>",
     "Run a single task headless (no prompts, risky tools auto-denied)",
   )
-  .action(async (opts: { resume?: string; print?: string }) => {
-    try {
-      if (opts.print !== undefined) {
-        await runOnce(opts.print);
-      } else {
-        await chat({ resume: opts.resume });
+  .option(
+    "--instruct <text>",
+    "Operator directive for this session (repeatable)",
+    collect,
+    [] as string[],
+  )
+  .option(
+    "--deny-tool <name>",
+    "Forbid a tool for this session (repeatable)",
+    collect,
+    [] as string[],
+  )
+  .action(
+    async (opts: {
+      resume?: string;
+      print?: string;
+      instruct: string[];
+      denyTool: string[];
+    }) => {
+      const directives = createDirectives();
+      for (const note of opts.instruct) addNote(directives, note);
+      for (const name of opts.denyTool) denyTool(directives, name);
+      try {
+        if (opts.print !== undefined) {
+          await runOnce(opts.print, directives);
+        } else {
+          await chat({ resume: opts.resume, directives });
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        write(colors.error(`\nfatal: ${message}\n`));
+        process.exitCode = 1;
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      write(colors.error(`\nfatal: ${message}\n`));
-      process.exitCode = 1;
-    }
-  });
+    },
+  );
 
 program
   .command("sessions")

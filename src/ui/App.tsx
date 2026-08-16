@@ -13,6 +13,12 @@ import { runTurn, type TurnEvent } from "../engine/conversation.ts";
 import { saveSession } from "../engine/history.ts";
 import { createFindingsStore } from "../engine/findings.ts";
 import { createSkillGate } from "../policy/skillGate.ts";
+import {
+  addNote,
+  denyTool,
+  formatDirectives,
+  type OperatorDirectives,
+} from "../policy/directives.ts";
 import type { Config } from "../engine/config.ts";
 import type { ModelConfig } from "../engine/model.ts";
 import { listTools } from "../tools/registry.ts";
@@ -74,6 +80,8 @@ export interface AppProps {
   banner: string[];
   /** Session briefing (skills + MCP) appended after the system prompt. */
   briefing?: string;
+  /** Operator directives for the session; mutated by /instruct and /deny. */
+  directives: OperatorDirectives;
 }
 
 /** Turn an SDK/network error into a short, actionable line for the operator. */
@@ -92,10 +100,13 @@ function describeTurnError(err: unknown): string {
 
 const HELP_LINES = [
   "In-session commands:",
-  "  /help          show this help",
-  "  /tools         list the agent's tools and which are gated",
-  "  /skills        list installed skill playbooks",
-  "  /exit, /quit   end the session",
+  "  /help              show this help",
+  "  /tools             list the agent's tools and which are gated",
+  "  /skills            list installed skill playbooks",
+  "  /instruct <text>   give the agent an instruction for this session",
+  "  /deny <tool>       forbid a tool for this session",
+  "  /directives        show the session's directives",
+  "  /exit, /quit       end the session",
   "",
   "Anything else is sent to the agent as a request.",
 ];
@@ -159,6 +170,7 @@ export function App({
   config,
   banner,
   briefing,
+  directives,
 }: AppProps): React.ReactNode {
   const { exit } = useApp();
   const { stdout } = useStdout();
@@ -206,6 +218,7 @@ export function App({
       config,
       findings: createFindingsStore(sessionPath),
       skillGate: createSkillGate(),
+      directives,
     };
   }
 
@@ -319,6 +332,54 @@ export function App({
       );
       return true;
     }
+    if (line === "/instruct" || line.startsWith("/instruct ")) {
+      const text = line.slice("/instruct".length).trim();
+      if (!text) {
+        pushEntries({
+          id: nextId(),
+          kind: "system",
+          text: "Usage: /instruct <text>",
+        });
+        return true;
+      }
+      addNote(directives, text);
+      pushEntries({
+        id: nextId(),
+        kind: "system",
+        text: `Directive added: ${text}`,
+      });
+      return true;
+    }
+    if (line === "/deny" || line.startsWith("/deny ")) {
+      const name = line.slice("/deny".length).trim();
+      if (!name) {
+        pushEntries({
+          id: nextId(),
+          kind: "system",
+          text: "Usage: /deny <tool>",
+        });
+        return true;
+      }
+      denyTool(directives, name);
+      pushEntries({
+        id: nextId(),
+        kind: "system",
+        text: `Tool denied for this session: ${name}`,
+      });
+      return true;
+    }
+    if (line === "/directives") {
+      const rendered = formatDirectives(directives);
+      const lines = rendered
+        ? rendered.split("\n")
+        : ["No operator directives set for this session."];
+      pushEntries(
+        ...lines.map(
+          (text) => ({ id: nextId(), kind: "system", text }) as Entry,
+        ),
+      );
+      return true;
+    }
     return false;
   }
 
@@ -336,7 +397,15 @@ export function App({
     history.push({ role: "user", content: line });
     setRunning(true);
     try {
-      await runTurn(client, history, ctxRef.current!, emit, model, briefing);
+      await runTurn(
+        client,
+        history,
+        ctxRef.current!,
+        emit,
+        model,
+        briefing,
+        formatDirectives(directives),
+      );
       pushEntries(...drainLive());
       saveSession(sessionPath, history);
     } catch (err) {
