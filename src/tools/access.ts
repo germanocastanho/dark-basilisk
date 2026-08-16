@@ -46,7 +46,7 @@ function pathVariants(
     { label: "trailing slash", path: `${trimmed}/` },
     { label: "trailing dot", path: `${trimmed}/.` },
     { label: "matrix ..;/", path: `${trimmed}/..;/` },
-    { label: "double slash", path: `/${trimmed}`.replace(/^\/+/, "//") },
+    { label: "double slash", path: `/${trimmed}` },
     { label: "%2e suffix", path: `${trimmed}%2e` },
     { label: "uppercase", path: trimmed.toUpperCase() },
   ];
