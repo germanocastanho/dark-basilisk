@@ -51,6 +51,7 @@ import {
 } from "./defense.ts";
 import { checkScope } from "../policy/scope.ts";
 import { gateAllows } from "../policy/skillGate.ts";
+import { toolDenied } from "../policy/directives.ts";
 
 /** Built-in capabilities compiled into the agent, keyed by tool name. */
 const BUILTINS: Tool[] = [
@@ -187,6 +188,15 @@ export async function dispatch(
   const tool = BY_NAME.get(name);
   if (!tool) {
     return { content: `Unknown tool: ${name}`, isError: true };
+  }
+
+  if (toolDenied(ctx.directives, name)) {
+    return {
+      content:
+        `Refused: "${name}" is denied by an operator directive for ` +
+        "this session.",
+      isError: true,
+    };
   }
 
   const scope = ctx.config.scope;

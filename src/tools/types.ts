@@ -7,6 +7,7 @@
 import type { Config } from "../engine/config.ts";
 import type { FindingsStore } from "../engine/findings.ts";
 import type { SkillGate } from "../policy/skillGate.ts";
+import type { OperatorDirectives } from "../policy/directives.ts";
 
 /**
  * Outcome of a single tool invocation. `content` is fed back to the model as a
@@ -37,6 +38,11 @@ export interface ToolContext {
    * enforcement (the tool set is never gated by a skill).
    */
   readonly skillGate?: SkillGate;
+  /**
+   * Operator-stated instructions for the session. Absent means none were
+   * given (the tool set is never gated by a directive).
+   */
+  readonly directives?: OperatorDirectives;
 }
 
 /**
