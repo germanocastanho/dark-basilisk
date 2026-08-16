@@ -17,14 +17,10 @@ Command-line cybersecurity agent that runs an agent loop powered by Anthropic's 
 ```bash
 # Clone the repository
 git clone https://github.com/germanocastanho/dark-basilisk
-
-# Navigate to the directory
 cd dark-basilisk/
 
 # Install dependencies
 bun install
-
-# Add to your PATH
 bun link
 
 # Set your API key
@@ -36,6 +32,4 @@ basilisk
 
 # 📜 Libre Software
 
-If you have ideas for improvements or new features, please open an issue or
-submit a pull request. Make sure to follow the existing code style and include
-tests for any new functionality. Licensed under the GNU GPL v3, so you are free to use, modify, and distribute this software. Please refer to the [LICENSE](LICENSE) for more!
+If you have ideas for improvements or new features, please open an issue or submit a pull request. Make sure to follow the existing code style and include tests for any new functionality. Licensed under the GNU GPL v3, so you are free to use, modify, and distribute this software. Please refer to the [LICENSE](LICENSE) for more!
